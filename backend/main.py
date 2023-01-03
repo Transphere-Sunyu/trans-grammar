@@ -1,27 +1,20 @@
+import datetime
 import json
 import os.path
 import re
-import time
-
-from fastapi.params import Path
-from fastapi.staticfiles import StaticFiles
 
 import errant
-import pandas as pd
 import torch
 from annotated_text import annotated_text
 from bs4 import BeautifulSoup
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from gramformer import Gramformer
 from pydantic import BaseModel
 from transformers import AutoModelForSeq2SeqLM
 from transformers import AutoTokenizer
-import datetime
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.exception_handlers import http_exception_handler
-from starlette.exceptions import HTTPException as StarletteHTTPException
+
 annotator = errant.load('en')
 
 PATH = os.path.abspath('models/gf.pth')
@@ -114,10 +107,7 @@ def correct_sentence(input_sentence):
         
         """
         corrected_sentences = gf.correct(influent_sentence, max_candidates=3)
-        # print("[Input] ", influent_sentence)
-        # for corrected_sentence in corrected_sentences:
-        #   print("[Correction] ",corrected_sentence)
-        #   print("[Edits] ", gf.highlight(influent_sentence, corrected_sentence))
+
         return corrected_sentences
 
 
@@ -166,6 +156,7 @@ def show_highlights(input_text, corrected_sentence):
 
                 if _tag == 'd':
                     _text = strikeout(tags[0].text)
+                    print(_text)
 
                 annotations.append((_text, _type, _desc))
             else:
@@ -178,17 +169,10 @@ def show_highlights(input_text, corrected_sentence):
 
     except Exception as e:
         print('Some error occured!' + str(e))
+        return 'An error occurred'
 
 
-def show_edits(input_text, corrected_sentence):
-    try:
-        edits = get_edits(input_text, corrected_sentence)
-        df = pd.DataFrame(edits, columns=['type', 'original word', 'original start', 'original end', 'correct word',
-                                          'correct start', 'correct end'])
-        df = df.set_index('type')
 
-    except Exception as e:
-        print('Some error occured!' + str(e))
 
 
 def description(orig, edit, edit_type):
@@ -247,23 +231,26 @@ def highlight(orig, cor):
                 edit_spos += 1
 
             if edit_type == "PUNCT":
-                timestamp = str(datetime.datetime.timestamp(datetime.datetime.now())).replace('.', '-') + edit_type
+                timestamp = str(datetime.datetime.timestamp(datetime.datetime.now())).replace('.', '-') + edit_type + edit_str_start[0]
+                edit_desc = description(edit_str_start, edit_str_end, edit_type)
 
-                st = "<a id=" + timestamp + " " + "type='" + edit_type + "' edit='" + \
+                st = "<a id=" + timestamp + " " + "' desc='" + edit_desc +  "type='" + edit_type + "' edit='" + \
                      edit_str_end + "'>" + new_edit_str + "</a>"
             else:
-                timestamp = str(datetime.datetime.timestamp(datetime.datetime.now())).replace('.', '-') + edit_type
+                timestamp = str(datetime.datetime.timestamp(datetime.datetime.now())).replace('.', '-') + edit_type  + edit_str_start[0]
+                edit_desc = description(edit_str_start, edit_str_end, edit_type)
 
-                st = "<a id=" + timestamp + " " + "type='" + edit_type + "' edit='" + new_edit_str + \
+                st = "<a id=" + timestamp + " " + "' desc='" + edit_desc + "type='" + edit_type + "' edit='" + new_edit_str + \
                      " " + edit_str_end + "'>" + new_edit_str + "</a>"
             orig_tokens[edit_spos] = st
         elif edit_str_end == "":
-            timestamp = str(datetime.datetime.timestamp(datetime.datetime.now())).replace('.', '-') + edit_type
+            timestamp = str(datetime.datetime.timestamp(datetime.datetime.now())).replace('.', '-') + edit_type + edit_str_start[0]
+            edit_desc = description(edit_str_start, edit_str_end, edit_type)
 
-            st = "<d id=" + timestamp + " " + "type='" + edit_type + "' edit=''>" + edit_str_start + "</d>"
+            st = "<d id=" + timestamp + " " + "' desc='" + edit_desc +  "type='" + edit_type + "' edit=''>" + edit_str_start + "</d>"
             orig_tokens[edit_spos] = st
         else:
-            timestamp = str(datetime.datetime.timestamp(datetime.datetime.now())).replace('.', '-') + edit_type
+            timestamp = str(datetime.datetime.timestamp(datetime.datetime.now())).replace('.', '-') + edit_type + edit_str_start[0]
 
             edit_desc = description(edit_str_start, edit_str_end, edit_type)
 
@@ -273,7 +260,6 @@ def highlight(orig, cor):
             orig_tokens[edit_spos] = st
 
     for i in sorted(ignore_indexes, reverse=True):
-        print(i)
         del (orig_tokens[i])
 
     return (" ".join(orig_tokens))
@@ -302,35 +288,3 @@ def _get_edits(orig, cor):
 def get_edits(orig, cor):
     return _get_edits(orig, cor)
 
-# def set_seed(seed):
-#   torch.manual_seed(seed)
-#   if torch.cuda.is_available():
-#     torch.cuda.manual_seed_all(seed)
-#
-# set_seed(1212)
-#
-#
-# gf = Gramformer(models = 1, use_gpu=False) # 1=corrector, 2=detector
-#
-#
-#
-# influent_sentences = [
-#     "He are moving here.",
-#     "I am doing fine. How is you?",
-#     "How is they?",
-#     "Matt like fish",
-#     "the collection of letters was original used by the ancient Romans",
-#     "We enjoys horror movies",
-#     "Anna and Mike is going skiing",
-#     "I walk to the store and I bought milk",
-#     " We all eat the fish and then made dessert",
-#     "I will eat fish for dinner and drink milk",
-#     "what be the reason for everyone leave the company",
-# ]
-#
-# for influent_sentence in influent_sentences:
-#     corrected_sentences = gf.correct(influent_sentence, max_candidates=1)
-#     print("[Input] ", influent_sentence)
-#     for corrected_sentence in corrected_sentences:
-#       print("[Correction] ",corrected_sentence)
-#     print("-" *100)
