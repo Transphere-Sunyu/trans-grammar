@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 name = "gunicorn config for FastAPI - Trans Grammer Api"
-accesslog = "/root/trans-grammar/gunicorn-access.log"
-errorlog = "/root/trans-grammar/gunicorn-error.log"
+accesslog = "/root/trans-grammar/backend/gunicorn-access.log"
+errorlog = "/root/trans-grammar/backend/gunicorn-error.log"
 
 bind = "0.0.0.0:8000"
 
