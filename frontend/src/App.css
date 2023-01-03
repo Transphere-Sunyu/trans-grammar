@@ -1,0 +1,223 @@
+html, body {
+  height:100%;
+}
+
+[contenteditable] {
+  outline: 0px solid transparent;
+}
+
+[type=DET] {
+  border-bottom: rgb(21, 159, 19) 2px solid;
+  /* background-color: rgb(182, 255, 181); */
+}
+
+[type=NOUN] {
+  border-bottom: #f3843f 2px solid;
+}
+.editor-body {
+  height: '100vh';
+}
+[type=SPELL] {
+
+  border-bottom: red 2px solid;
+}
+[type=PUNCT] {
+
+  border-bottom: rgb(187, 0, 255) 2px solid;
+}
+[type=OTHER] {
+
+  border-bottom: rgb(0, 68, 255) 2px solid;
+}
+
+[type=ORTH] {
+
+  border-bottom: rgb(195, 0, 255) 2px solid;
+}
+[type="VERB:FORM"] {
+
+  border-bottom: rgb(38, 197, 105) 2px solid;
+}
+
+[type="NOUN:NUM"] {
+
+  border-bottom: rgb(255, 123, 0) 2px solid;
+}
+
+[type=MORPH] {
+
+  border-bottom: rgb(255, 196, 0) 2px solid;
+}
+
+
+[type='VERB:TENSE'] {
+
+  border-bottom: rgb(255, 0, 106) 2px solid;
+}
+
+[type='VERB:SVA'] {
+
+  border-bottom: rgb(0, 161, 54) 2px solid;
+}
+
+
+
+#editor-wrapper {
+  width: auto;
+  height: 400px;
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 3%;
+
+}
+
+.container {
+  margin: auto;
+  width: 50%;
+  padding: 5% 0;
+  height: 100%;
+}
+.loading-wrapper h3 {
+  border-bottom: 4px solid #f3843f;
+  padding-bottom: 1.5pt;
+  margin-left : 9pt;
+}
+#editor-box {
+  max-width: 60%;
+  width: 60%;
+  min-width: 60%;
+  height: fit-content;
+  max-height: 100%;
+  border-radius: 10px;
+  padding:  5%;
+  margin: 2% 0%;
+  overflow-y: auto;
+  outline: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  
+}
+
+#editor-box:empty:before {
+  content: "Start typing here";
+}
+
+.right-container {
+  height: 100%;
+  width: 100%;
+  
+}
+.loader {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+h5 {
+  margin: 0 1em;
+}
+
+
+.align-center {
+  display: flex;
+  align-items: center;
+}
+.status-dot {
+  border-radius: 50%;
+  width: 5px;
+  height: 5px;
+  background-color: #f3843f;
+  margin-right: 0.75em;
+}
+
+.wrong-text {
+  margin-top: 1em;
+  text-decoration: line-through;
+  width: fit-content;
+}
+
+.edit-text {
+  margin-top: 1em;
+  border-radius: 5px;
+  background-color: #eaeaea;
+  text-align: center;
+  width: fit-content;
+  padding: 7%;
+  cursor: pointer;
+}
+
+h4 {
+  margin: 0.3rem;
+}
+
+@keyframes growProgressBar {
+  0%, 33% { --pgPercentage: 0; }
+  100% { --pgPercentage: var(--value); }
+}
+
+@property --pgPercentage {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+div[role="progressbar"] {
+  --size: 3rem;
+  --fg: red;
+  --bg: rgb(255, 179, 179);
+  --pgPercentage: var(--value);
+  animation: growProgressBar 3s 1 forwards;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: 
+    radial-gradient(closest-side, white 80%, transparent 0 99.9%, white 0),
+    conic-gradient(var(--fg) calc(var(--pgPercentage) * 1%), var(--bg) 0)
+    ;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: calc(var(--size) / 4);
+  color: var(--fg);
+}
+
+div[role="progressbar"]::before {
+  counter-reset: percentage var(--value);
+  content: counter(percentage) '%';
+}
+
+.flex-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.flex-column small {
+  margin-left: 0.5em;
+}
+
+.nav-icons {
+  margin-top: auto;
+  margin-bottom: 0;
+  align-items: flex-end;
+}
+
+.nav-icons :first-child{
+  flex-grow: 1;
+}
+
+.nav-icons :nth-child(2){
+  flex-grow: 1;
+}
