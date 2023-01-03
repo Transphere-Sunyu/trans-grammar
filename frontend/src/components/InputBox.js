@@ -115,7 +115,7 @@ export default function InputBox() {
   const getSentence = async (sentence) => {
     try {
       setLoading(true);
-      const res = await fetch(`https://grandetails.com/sentence`, {
+      const res = await fetch(`https://grandetails.com/api/sentence`, {
         method: "post",
         mode: "cors",
         headers: {

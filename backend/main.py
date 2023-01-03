@@ -2,6 +2,8 @@ import json
 import os.path
 import re
 import time
+
+from fastapi.params import Path
 from fastapi.staticfiles import StaticFiles
 
 import errant
@@ -16,14 +18,19 @@ from pydantic import BaseModel
 from transformers import AutoModelForSeq2SeqLM
 from transformers import AutoTokenizer
 import datetime
-
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.exception_handlers import http_exception_handler
+from starlette.exceptions import HTTPException as StarletteHTTPException
 annotator = errant.load('en')
 
 PATH = os.path.abspath('models/gf.pth')
 
 print("Loading models...")
 
-app = FastAPI()
+api_app = FastAPI(title="Trans Grammar API")
+
+app = FastAPI(title="Trans Grammar APP")
 
 
 class Sentences(BaseModel):
@@ -46,7 +53,6 @@ app.add_middleware(
     allow_headers=["*"],
 
 )
-app.mount("/", StaticFiles(directory="build", html=True), name="static")
 
 
 device = "cpu"
@@ -82,14 +88,10 @@ except:
 #     return {"Gramformer !"}
 
 
-# @app.get("/{correct}")
-# def get_correction(input_sentence):
-#     set_seed(1212)
-#     scored_corrected_sentence = correct(input_sentence)
-#     return {"scored_corrected_sentence": scored_corrected_sentence}
 
-@app.post("/sentence")
-def get_corrected_sentence(sentences: Sentences):
+
+@api_app.post("/sentence")
+async def get_corrected_sentence(sentences: Sentences):
     sentence_list = sentences.sentences
     # print(sentence_list)
     set_seed(1212)
@@ -100,6 +102,9 @@ def get_corrected_sentence(sentences: Sentences):
     highlighted_sentences = show_highlights(sentence_list[0], sent_list[0])
 
     return json.dumps({'corrected_sentence': highlighted_sentences})
+app.mount("/api", api_app)
+
+app.mount("/", StaticFiles(directory="build", html=True), name="static")
 
 
 def correct_sentence(input_sentence):
