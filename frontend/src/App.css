@@ -1,3 +1,21 @@
+
+@font-face {
+  font-family: 'Inter';
+  font-style:  normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./fonts/Inter-Regular.woff2?v=3.19") format("woff2"),
+       url("./fonts/Inter-Regular.woff?v=3.19") format("woff");
+}
+@font-face {
+  font-family: 'Inter-Bold';
+  font-style:  bold;
+  font-weight: 900;
+  font-display: swap;
+  src: url("./fonts/Inter-Bold.woff2?v=3.19") format("woff2"),
+       url("./fonts/Inter-Bold.woff?v=3.19") format("woff");
+}
+
 html, body {
   height:100%;
 }
@@ -64,11 +82,11 @@ html, body {
 
 #editor-wrapper {
   width: auto;
-  height: 400px;
+  height: 500px;
   box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  border-radius: 10px;
+  border-radius: 30px;
   overflow: hidden;
-  padding: 3%;
+  /* padding: 3%; */
 
 }
 
@@ -81,12 +99,12 @@ html, body {
 .loading-wrapper h3 {
   border-bottom: 4px solid #f3843f;
   padding-bottom: 1.5pt;
-  margin-left : 9pt;
+  margin-right : 9pt;
 }
 #editor-box {
-  max-width: 60%;
-  width: 60%;
-  min-width: 60%;
+  /* max-width: 60%; */
+  width: auto;
+  /* min-width: 60%; */
   height: fit-content;
   max-height: 100%;
   border-radius: 10px;
@@ -97,6 +115,10 @@ html, body {
   white-space: pre-wrap;
   word-wrap: break-word;
   word-break: break-word;
+  font-family: 'Inter';
+  letter-spacing: 4.5%;
+  font-size: 16px;
+  line-height: 149%;
   
 }
 
@@ -146,7 +168,8 @@ h5 {
 .edit-text {
   margin-top: 1em;
   border-radius: 5px;
-  background-color: #eaeaea;
+  background-color: #000;
+  color: #fff;
   text-align: center;
   width: fit-content;
   padding: 7%;
@@ -209,15 +232,24 @@ div[role="progressbar"]::before {
 }
 
 .nav-icons {
-  margin-top: auto;
+  /* margin-top: auto;
   margin-bottom: 0;
-  align-items: flex-end;
+  align-items: flex-end; */
 }
 
-.nav-icons :first-child{
+/* .nav-icons :first-child{
   flex-grow: 1;
 }
 
 .nav-icons :nth-child(2){
   flex-grow: 1;
+} */
+
+.align-center small {
+  font-family: 'Inter-Bold';
+}
+
+.description , .align-center .flex-column small{
+  font-family: 'Inter';
+  color: #A9A5A5;
 }

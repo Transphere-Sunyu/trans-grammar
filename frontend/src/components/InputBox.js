@@ -4,10 +4,54 @@ import { TailSpin } from "react-loader-spinner";
 import Stats from "./Stats";
 import {
   ArrowDownOutlined,
-  LeftCircleOutlined,
-  RightCircleOutlined,
+  ExclamationCircleOutlined,
+  LeftOutlined,
+  RightOutlined,
 } from "@ant-design/icons";
-import { Box, Center } from "@chakra-ui/react";
+import { Box, Center, Flex,
+
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverAnchor,
+  Button,
+  Portal,
+  useDisclosure,
+  
+} from "@chakra-ui/react";
+import { MdOutlineTranslate } from "react-icons/md";
+
+const PopoverBox = () => {
+  const { onOpen, onClose, isOpen } = useDisclosure()
+  const firstFieldRef = React.useRef(null)
+
+  return (
+
+      <Popover
+        isOpen={isOpen}
+        initialFocusRef={firstFieldRef}
+        onOpen={onOpen}
+        onClose={onClose}
+        placement='right'
+        closeOnBlur={false}
+      >
+        <PopoverTrigger>
+          {/* <IconButton size='sm' icon={<EditIcon />} /> */}
+        </PopoverTrigger>
+        <PopoverContent p={5}>
+          {/* <FocusLock returnFocus persistentFocus={false}> */}
+            <PopoverArrow />
+            <PopoverCloseButton />
+          {/* </FocusLock> */}
+        </PopoverContent>
+      </Popover>
+  )
+}
 
 export default function InputBox() {
   const [input, setInput] = useState("");
@@ -18,6 +62,9 @@ export default function InputBox() {
   const [correction, setCorrection] = useState(null);
   const [isCorrected, setIsCorrected] = useState(false);
   const [alerts, setAlerts] = useState(0);
+  const [wordCount, setWordCount] = useState(0);
+  const { isOpen, onToggle, onClose } = useDisclosure()
+
 
   // Sets the cursor to the end of the text
   const setCarat = (element) => {
@@ -141,7 +188,7 @@ export default function InputBox() {
   };
 
   // Check if text has an edit attribute
-  const handleClick = (e) => {
+  const clickOnText = (e) => {
     if (e.target.hasAttribute("edit")) {
       const edit = e.target.getAttribute("edit");
       const type = e.target.getAttribute("type");
@@ -206,17 +253,24 @@ export default function InputBox() {
     setCorrectSentence(false);
 
     if (editorContent && editorContent !== "\n") {
-
       // Set editor text state
       setInput(editorContent);
       setTyping(false);
     }
-  }, 5000);
+  }, 4000);
 
+  // Count total words in the editor
+  const totalWordCount = () => {
+    let s = document.getElementById("editor-box").innerText;
+
+    s = s.replace(/(^\s*)|(\s*$)/gi, "");
+    s = s.replace(/[ ]{2,}/gi, " ");
+    s = s.replace(/\n /, "\n");
+    setWordCount(s.split(" ").length);
+  };
 
   useEffect(() => {
     if (input && !correctSentence) {
-      
       if (!typing) {
         getSentence(input).then((res) => {
           const editorBox = document.getElementById("editor-box");
@@ -224,11 +278,9 @@ export default function InputBox() {
           // If user is typing
           // Prevent updating the text box innerHTML
 
-         if(!loading){
-
-          
-          editorBox.innerHTML = res;
-         }
+          if (!loading) {
+            editorBox.innerHTML = res;
+          }
 
           var tag = document.getElementById("editor-box");
           setCarat(tag);
@@ -268,7 +320,6 @@ export default function InputBox() {
   // useEffect(() => {
   //   document.addEventListener('keydown',detectTyping,true)
 
-  
   //   return () => {
   //     console.log('keystroke unmounted')
   //   }
@@ -277,7 +328,6 @@ export default function InputBox() {
   // useEffect(() => {
   //   document.addEventListener('keyup',detectStopTyping,true)
 
-  
   //   return () => {
   //     console.log('keystroke unmounted')
   //   }
@@ -286,40 +336,89 @@ export default function InputBox() {
   const detectTyping = (e) => {
     // setTyping(true)
     console.log(e);
-    return e.type
-  }
+    return e.type;
+  };
 
   const detectStopTyping = (e) => {
     // setTyping(false)
     console.log(e);
-    return e.type
-
-  }
-  
+    return e.type;
+  };
 
   return (
-    <div className="container">
+    <Box className="container">
       <div></div>
 
-      <div id="editor-wrapper">
+      <Box border={"solid"} borderColor={"#F3843F"} id="editor-wrapper">
         <div className="flex-row">
-          <div
-            name="editor-box"
-            rows="4"
-            cols="50"
-            id="editor-box"
-            onClick={handleClick}
-            onInput={() => {
-              // setTyping(true);
-              handleText();
-            }}
-            contentEditable={true}
+          <Box w={"100%"} position={"relative"} h={"100%"}>
+            <div
+              name="editor-box"
+              rows="4"
+              cols="50"
+              id="editor-box"
+              onClick={clickOnText}
+              onInput={() => {
+                // setTyping(true);
+
+                handleText();
+              }}
+              contentEditable={true}
+            >
+
+              <p></p>
+            </div>
+            <Box
+              bg={"#fff"}
+              w={"100%"}
+              position={"absolute"}
+              bottom={0}
+              left={0}
+              right={0}
+              top={"auto"}
+            >
+              <Flex justifyContent={"space-evenly"} p={"3%"}>
+                <Stats
+                  titleColor={`#FF5B5B`}
+                  icon={
+                    <ExclamationCircleOutlined
+                      color="#FF5B5B"
+                      style={{
+                        fontSize: "24px",
+                        marginRight: "7%",
+                        color: "#FF5B5B",
+                      }}
+                    />
+                  }
+                  category={"Issues"}
+                  value={correctSentence}
+                  desc={`${alerts} ${alerts === 1 ? "alert" : "alerts"} found`}
+                />
+                <Stats
+                  titleColor={`#24AE4A`}
+                  icon={
+                    <MdOutlineTranslate
+                      color="#24AE4A"
+                      style={{ fontSize: "34px", marginRight: "7%" }}
+                    />
+                  }
+                  category={"Word Count"}
+                  value={correctSentence}
+                  desc={`${wordCount} ${wordCount === 1 ? "word" : "words"}`}
+                />
+              </Flex>
+            </Box>
+          </Box>
+          <Box
+            padding={"2%"}
+            borderLeft={"solid"}
+            borderColor={"#F3843F"}
+            w={"45%"}
+            className="flex-box"
           >
-            <p></p>
-          </div>
-          <div className="right-container flex-box">
             <div>
-              <div className="loading-wrapper center">
+              <Flex alignItems={"center"} className="loading-wrapper ">
+                <h3>Suggestions</h3>
                 <Box width={30} height={30}>
                   <TailSpin
                     height="30"
@@ -332,11 +431,10 @@ export default function InputBox() {
                     visible={loading}
                   />
                 </Box>
-                <h3>Suggestions</h3>
 
                 <br />
                 <br />
-              </div>
+              </Flex>
               {correction && correction?.type && (
                 <div>
                   <div className="align-center">
@@ -354,23 +452,44 @@ export default function InputBox() {
                       {correction?.edit}
                     </h4>
                   </Center>
-                  <p>{correction?.description}</p>
+                  <p className="description">{correction?.description}</p>
                 </div>
               )}
             </div>
-            <div className="nav-icons flex-row">
-              <LeftCircleOutlined
-                onClick={previousElement}
-                style={{ fontSize: 27, cursor: "pointer" }}
-              />
-              <RightCircleOutlined
-                onClick={nextElement}
-                style={{ fontSize: 27, cursor: "pointer" }}
-              />
-            </div>
-          </div>
+            <Flex
+              justifyContent={"space-evenly"}
+              alignItems={"flex-end"}
+              className="nav-icons flex-row"
+            >
+              <Box
+                border={"solid"}
+                borderWidth={2}
+                borderColor={"#000"}
+                w={"auto"}
+                borderRadius={6}
+                p={7}
+              >
+                <LeftOutlined
+                  onClick={previousElement}
+                  style={{ fontSize: 27, cursor: "pointer", fontSize: 24 }}
+                />
+              </Box>
+              <Box
+                border={"solid"}
+                borderWidth={2}
+                borderColor={"#000"}
+                borderRadius={6}
+                p={7}
+              >
+                <RightOutlined
+                  onClick={nextElement}
+                  style={{ fontSize: 27, cursor: "pointer", fontSize: 24 }}
+                />
+              </Box>
+            </Flex>
+          </Box>
         </div>
-      </div>
+      </Box>
       {/* <Editor
         editorState={editorState}
         wrapperClassName="editor"
@@ -380,7 +499,6 @@ export default function InputBox() {
       /> */}
       <br />
       <br />
-      <Stats category={"Correctness"} value={correctSentence} count={alerts} />
-    </div>
+    </Box>
   );
 }
