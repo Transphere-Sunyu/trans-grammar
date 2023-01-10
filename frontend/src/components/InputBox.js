@@ -26,32 +26,6 @@ import { Box, Center, Flex,
 } from "@chakra-ui/react";
 import { MdOutlineTranslate } from "react-icons/md";
 
-const PopoverBox = () => {
-  const { onOpen, onClose, isOpen } = useDisclosure()
-  const firstFieldRef = React.useRef(null)
-
-  return (
-
-      <Popover
-        isOpen={isOpen}
-        initialFocusRef={firstFieldRef}
-        onOpen={onOpen}
-        onClose={onClose}
-        placement='right'
-        closeOnBlur={false}
-      >
-        <PopoverTrigger>
-          {/* <IconButton size='sm' icon={<EditIcon />} /> */}
-        </PopoverTrigger>
-        <PopoverContent p={5}>
-          {/* <FocusLock returnFocus persistentFocus={false}> */}
-            <PopoverArrow />
-            <PopoverCloseButton />
-          {/* </FocusLock> */}
-        </PopoverContent>
-      </Popover>
-  )
-}
 
 export default function InputBox() {
   const [input, setInput] = useState("");
@@ -65,7 +39,8 @@ export default function InputBox() {
   const [wordCount, setWordCount] = useState(0);
   const { isOpen, onToggle, onClose } = useDisclosure()
   const {showPopover,setShowPopover} =  useState(false)
-  const {position , setPosition} = useState({x: 0,y:0})
+  const {positionX , setPositionX} = useState(0)
+  const {positionY , setPositionY} = useState(0)
 
 
   // Sets the cursor to the end of the text
@@ -196,6 +171,8 @@ export default function InputBox() {
       const type = e.target.getAttribute("type");
       const description = e.target.getAttribute("desc");
       console.log(e.target.offsetLeft);
+      setPositionX(e.target.offsetLeft)
+      setPositionY(e.target.offsetTop)
 
       const value = e.target.innerText;
       const id = e.target.id;
@@ -250,6 +227,7 @@ export default function InputBox() {
   // Debounce Input text
   // Update input text
   const handleText = debounce(() => {
+    totalWordCount()
     const editor = document.getElementById("editor-box");
 
     const editorContent = editor.innerText;
@@ -355,7 +333,7 @@ export default function InputBox() {
       <Box border={"solid"} borderColor={"#F3843F"} id="editor-wrapper">
         <div className="flex-row">
           <Box w={"100%"}  position={"relative"} h={"100%"}>
-            
+      
             <div
               name="editor-box"
               rows="4"
