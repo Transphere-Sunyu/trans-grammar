@@ -121,6 +121,15 @@ html, body {
   line-height: 149%;
   
 }
+#popover {
+  top: 10px;
+  left: 10px;
+
+}
+
+#popover .description {
+  font-size: 14px;
+}
 
 #editor-box:empty:before {
   content: "Start typing here";

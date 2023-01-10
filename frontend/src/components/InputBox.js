@@ -10,22 +10,14 @@ import {
 } from "@ant-design/icons";
 import { Box, Center, Flex,
 
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverFooter,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverAnchor,
   Button,
-  Portal,
   useDisclosure,
+  Spacer,
   
 } from "@chakra-ui/react";
 import { MdOutlineTranslate } from "react-icons/md";
-
+import { FiCheckSquare } from 'react-icons/fi'
+import { AiOutlineClose } from 'react-icons/ai'
 
 export default function InputBox() {
   const [input, setInput] = useState("");
@@ -38,9 +30,8 @@ export default function InputBox() {
   const [alerts, setAlerts] = useState(0);
   const [wordCount, setWordCount] = useState(0);
   const { isOpen, onToggle, onClose } = useDisclosure()
-  const {showPopover,setShowPopover} =  useState(false)
-  const {positionX , setPositionX} = useState(0)
-  const {positionY , setPositionY} = useState(0)
+  const [showPopover,setShowPopover] =  useState(false)
+
 
 
   // Sets the cursor to the end of the text
@@ -78,6 +69,8 @@ export default function InputBox() {
 
   const nextElement = () => {
     try {
+      setShowPopover(false);
+
       // Get element Id from correction state
       // Get element node from correction id prop
 
@@ -97,6 +90,8 @@ export default function InputBox() {
         description: description,
       };
 
+      // Correction object
+
       setCorrection(editObj);
 
       console.log(editObj);
@@ -109,6 +104,9 @@ export default function InputBox() {
 
   const previousElement = () => {
     try {
+
+      setShowPopover(false);
+
       // Get element Id from correction state
       // Get element node from correction id prop
 
@@ -170,9 +168,15 @@ export default function InputBox() {
       const edit = e.target.getAttribute("edit");
       const type = e.target.getAttribute("type");
       const description = e.target.getAttribute("desc");
-      console.log(e.target.offsetLeft);
-      setPositionX(e.target.offsetLeft)
-      setPositionY(e.target.offsetTop)
+
+      let popover = document.getElementById('popover')
+
+      // Change position of the popover
+      // According to the highlighted text
+      // Offset the top with the font size + 4px
+      popover.style.top = e.target.offsetTop + 25 + 'px'
+      popover.style.left = e.target.offsetLeft + 'px'
+
 
       const value = e.target.innerText;
       const id = e.target.id;
@@ -185,6 +189,7 @@ export default function InputBox() {
       };
 
       setCorrection(editObj);
+      setShowPopover(true)
 
       console.log(editObj);
     }
@@ -209,6 +214,7 @@ export default function InputBox() {
       element.removeAttribute("edit");
       element.removeAttribute("type");
       setCorrection(null);
+      setShowPopover(false);
       // Get number of spans
       // Number of span tags represent
       // errored sections
@@ -249,6 +255,33 @@ export default function InputBox() {
     s = s.replace(/\n /, "\n");
     setWordCount(s.split(" ").length);
   };
+
+  // Ignore correction
+  // This removes the selected correction object from the correction state
+ 
+  const ignoreCorrection = () => {
+      const element = document.getElementById(correction.id);
+
+      setIsCorrected(true);
+
+      // Remove 'type' attribute
+      // This will unhighlight the edited text
+      element.removeAttribute("edit");
+      element.removeAttribute("type");
+      setShowPopover(false);
+      // Get number of spans
+      // Number of span tags represent
+      // errored sections
+      // This value is used to show alerts
+
+      const highlightedSections = document.querySelectorAll("[edit]");
+
+      // Subtract 2 from  highlightedSections to account
+      // for react icons span tags
+
+      setAlerts(highlightedSections.length);
+
+  }
 
   useEffect(() => {
     if (input && !correctSentence) {
@@ -333,7 +366,40 @@ export default function InputBox() {
       <Box border={"solid"} borderColor={"#F3843F"} id="editor-wrapper">
         <div className="flex-row">
           <Box w={"100%"}  position={"relative"} h={"100%"}>
-      
+            <Box id="popover" display={ showPopover ? 'box' : 'none'} zIndex={100} w={'40%'} h={'fit-content'} bg={'#fff'} position={'absolute'} borderRadius={12} border={'solid'} overflow={'hidden'} borderWidth={2} >
+              <Box p={'4%'}>
+              {correction && correction?.type && (
+                <div>
+                  <Flex>
+                  <div className="align-center">
+                    <div className="status-dot"></div>
+                    <small>{correction.type}</small>
+                  
+                  </div>
+                  <Spacer/>
+                  <Flex onClick={() => setShowPopover(false)} cursor={'pointer'}>
+                  <AiOutlineClose />
+                  </Flex>
+                  </Flex>
+                  <p className="description">{correction?.description}</p>
+
+                  <Flex flexDirection={"column"}>
+                    
+                    <h4
+                      className="edit-text"
+                      type={correction?.type}
+                      onClick={handleEditText}
+                    >
+                      {correction?.edit}
+                    </h4>
+                  </Flex>
+                </div>
+              )}
+              
+              </Box>
+              <Button w={'100%'} p={'4%'} bg={`#000`} leftIcon={<FiCheckSquare/>} color={'#fff'} onClick={() => ignoreCorrection()} >Ignore correction</Button>
+
+            </Box>
             <div
               name="editor-box"
               rows="4"
