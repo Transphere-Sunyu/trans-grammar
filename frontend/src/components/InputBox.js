@@ -233,13 +233,14 @@ export default function InputBox() {
   // Debounce Input text
   // Update input text
   const handleText = debounce(() => {
-    totalWordCount()
+    
     const editor = document.getElementById("editor-box");
 
     const editorContent = editor.innerText;
     setCorrectSentence(false);
 
     if (editorContent && editorContent !== "\n") {
+      totalWordCount()
       // Set editor text state
       setInput(editorContent);
       setTyping(false);
