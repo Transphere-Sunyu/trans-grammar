@@ -64,6 +64,8 @@ export default function InputBox() {
   const [alerts, setAlerts] = useState(0);
   const [wordCount, setWordCount] = useState(0);
   const { isOpen, onToggle, onClose } = useDisclosure()
+  const {showPopover,setShowPopover} =  useState(false)
+  const {position , setPosition} = useState({x: 0,y:0})
 
 
   // Sets the cursor to the end of the text
@@ -193,6 +195,7 @@ export default function InputBox() {
       const edit = e.target.getAttribute("edit");
       const type = e.target.getAttribute("type");
       const description = e.target.getAttribute("desc");
+      console.log(e.target.offsetLeft);
 
       const value = e.target.innerText;
       const id = e.target.id;
@@ -351,7 +354,8 @@ export default function InputBox() {
 
       <Box border={"solid"} borderColor={"#F3843F"} id="editor-wrapper">
         <div className="flex-row">
-          <Box w={"100%"} position={"relative"} h={"100%"}>
+          <Box w={"100%"}  position={"relative"} h={"100%"}>
+            
             <div
               name="editor-box"
               rows="4"
