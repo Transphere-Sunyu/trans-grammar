@@ -8,16 +8,16 @@ import {
   LeftOutlined,
   RightOutlined,
 } from "@ant-design/icons";
-import { Box, Center, Flex,
-
+import {
+  Box,
+  Center,
+  Flex,
   Button,
-  useDisclosure,
   Spacer,
-  
 } from "@chakra-ui/react";
 import { MdOutlineTranslate } from "react-icons/md";
-import { FiCheckSquare } from 'react-icons/fi'
-import { AiOutlineClose } from 'react-icons/ai'
+import { FiCheckSquare } from "react-icons/fi";
+import { AiOutlineClose } from "react-icons/ai";
 
 export default function InputBox() {
   const [input, setInput] = useState("");
@@ -29,10 +29,7 @@ export default function InputBox() {
   const [isCorrected, setIsCorrected] = useState(false);
   const [alerts, setAlerts] = useState(0);
   const [wordCount, setWordCount] = useState(0);
-  const { isOpen, onToggle, onClose } = useDisclosure()
-  const [showPopover,setShowPopover] =  useState(false)
-
-
+  const [showPopover, setShowPopover] = useState(false);
 
   // Sets the cursor to the end of the text
   const setCarat = (element) => {
@@ -104,7 +101,6 @@ export default function InputBox() {
 
   const previousElement = () => {
     try {
-
       setShowPopover(false);
 
       // Get element Id from correction state
@@ -169,14 +165,13 @@ export default function InputBox() {
       const type = e.target.getAttribute("type");
       const description = e.target.getAttribute("desc");
 
-      let popover = document.getElementById('popover')
+      let popover = document.getElementById("popover");
 
       // Change position of the popover
       // According to the highlighted text
       // Offset the top with the font size + 4px
-      popover.style.top = e.target.offsetTop + 25 + 'px'
-      popover.style.left = e.target.offsetLeft + 'px'
-
+      popover.style.top = e.target.offsetTop + 25 + "px";
+      popover.style.left = e.target.offsetLeft + "px";
 
       const value = e.target.innerText;
       const id = e.target.id;
@@ -189,7 +184,7 @@ export default function InputBox() {
       };
 
       setCorrection(editObj);
-      setShowPopover(true)
+      setShowPopover(true);
 
       console.log(editObj);
     }
@@ -232,15 +227,15 @@ export default function InputBox() {
   };
   // Debounce Input text
   // Update input text
+  
   const handleText = debounce(() => {
-    
     const editor = document.getElementById("editor-box");
 
     const editorContent = editor.innerText;
     setCorrectSentence(false);
 
     if (editorContent && editorContent !== "\n") {
-      totalWordCount()
+      totalWordCount();
       // Set editor text state
       setInput(editorContent);
       setTyping(false);
@@ -259,32 +254,34 @@ export default function InputBox() {
 
   // Ignore correction
   // This removes the selected correction object from the correction state
- 
+
   const ignoreCorrection = () => {
-      const element = document.getElementById(correction.id);
+    const element = document.getElementById(correction.id);
 
-      setIsCorrected(true);
+    setIsCorrected(true);
 
-      // Remove 'type' attribute
-      // This will unhighlight the edited text
-      element.removeAttribute("edit");
-      element.removeAttribute("type");
-      setShowPopover(false);
-      // Get number of spans
-      // Number of span tags represent
-      // errored sections
-      // This value is used to show alerts
+    // Remove 'type' attribute
+    // This will unhighlight the edited text
+    element.removeAttribute("edit");
+    element.removeAttribute("type");
+    setShowPopover(false);
+    // Get number of spans
+    // Number of span tags represent
+    // errored sections
+    // This value is used to show alerts
 
-      const highlightedSections = document.querySelectorAll("[edit]");
+    const highlightedSections = document.querySelectorAll("[edit]");
 
-      // Subtract 2 from  highlightedSections to account
-      // for react icons span tags
+    // Subtract 2 from  highlightedSections to account
+    // for react icons span tags
 
-      setAlerts(highlightedSections.length);
-
-  }
+    setAlerts(highlightedSections.length);
+  };
 
   useEffect(() => {
+    // document.addEventListener('keydown',detectTyping,true)
+    
+    
     if (input && !correctSentence) {
       if (!typing) {
         getSentence(input).then((res) => {
@@ -292,8 +289,22 @@ export default function InputBox() {
 
           // If user is typing
           // Prevent updating the text box innerHTML
+          // Check if editor-box has typing className
+          // Which is added on typing
+          // and removed on keyup
 
-          if (!loading) {
+          // TODO: dynamically replace the text while the user is typing
+
+          // Get the text from the api response
+          const apiText = res.replace(/<[^>]+>/g, '')
+
+          // Get the text from the editor
+          const editorText = editorBox.innerText
+
+          // Only replaces the whole editor-text box text if the 
+          // lengths are the same
+          if (!loading && apiText.length == editorText.length ) {            
+
             editorBox.innerHTML = res;
           }
 
@@ -349,14 +360,20 @@ export default function InputBox() {
   // }, [])
 
   const detectTyping = (e) => {
-    // setTyping(true)
-    console.log(e);
+    setTyping(true)
+    const editor = e.target
+    editor.classList.add('typing')
+    
+    console.log(editor.classList);
     return e.type;
   };
 
   const detectStopTyping = (e) => {
-    // setTyping(false)
-    console.log(e);
+    setTyping(false)
+    const editor = e.target
+    editor.classList.remove('typing')
+    
+    console.log(editor.classList);
     return e.type;
   };
 
@@ -366,40 +383,60 @@ export default function InputBox() {
 
       <Box border={"solid"} borderColor={"#F3843F"} id="editor-wrapper">
         <div className="flex-row">
-          <Box w={"100%"}  position={"relative"} h={"100%"}>
-            <Box id="popover" display={ showPopover ? 'box' : 'none'} zIndex={100} w={'40%'} h={'fit-content'} bg={'#fff'} position={'absolute'} borderRadius={12} border={'solid'} overflow={'hidden'} borderWidth={2} >
-              <Box p={'4%'}>
-              {correction && correction?.type && (
-                <div>
-                  <Flex>
-                  <div className="align-center">
-                    <div className="status-dot"></div>
-                    <small>{correction.type}</small>
-                  
+          <Box w={"100%"} position={"relative"} h={"100%"}>
+            <Box
+              id="popover"
+              display={showPopover ? "box" : "none"}
+              zIndex={100}
+              w={"40%"}
+              h={"fit-content"}
+              bg={"#fff"}
+              position={"absolute"}
+              borderRadius={12}
+              border={"solid"}
+              overflow={"hidden"}
+              borderWidth={2}
+            >
+              <Box p={"4%"}>
+                {correction && correction?.type && (
+                  <div>
+                    <Flex>
+                      <div className="align-center">
+                        <div className="status-dot"></div>
+                        <small>{correction.type}</small>
+                      </div>
+                      <Spacer />
+                      <Flex
+                        onClick={() => setShowPopover(false)}
+                        cursor={"pointer"}
+                      >
+                        <AiOutlineClose />
+                      </Flex>
+                    </Flex>
+                    <p className="description">{correction?.description}</p>
+
+                    <Flex flexDirection={"column"}>
+                      <h4
+                        className="edit-text"
+                        type={correction?.type}
+                        onClick={handleEditText}
+                      >
+                        {correction?.edit}
+                      </h4>
+                    </Flex>
                   </div>
-                  <Spacer/>
-                  <Flex onClick={() => setShowPopover(false)} cursor={'pointer'}>
-                  <AiOutlineClose />
-                  </Flex>
-                  </Flex>
-                  <p className="description">{correction?.description}</p>
-
-                  <Flex flexDirection={"column"}>
-                    
-                    <h4
-                      className="edit-text"
-                      type={correction?.type}
-                      onClick={handleEditText}
-                    >
-                      {correction?.edit}
-                    </h4>
-                  </Flex>
-                </div>
-              )}
-              
+                )}
               </Box>
-              <Button w={'100%'} p={'4%'} bg={`#000`} leftIcon={<FiCheckSquare/>} color={'#fff'} onClick={() => ignoreCorrection()} >Ignore correction</Button>
-
+              <Button
+                w={"100%"}
+                p={"4%"}
+                bg={`#000`}
+                leftIcon={<FiCheckSquare />}
+                color={"#fff"}
+                onClick={() => ignoreCorrection()}
+              >
+                Ignore correction
+              </Button>
             </Box>
             <div
               name="editor-box"
@@ -414,7 +451,6 @@ export default function InputBox() {
               }}
               contentEditable={true}
             >
-
               <p></p>
             </div>
             <Box

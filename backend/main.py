@@ -141,22 +141,26 @@ def show_highlights(input_text, corrected_sentence):
         highlight_text = highlight(input_text, corrected_sentence)
         color_map = {'d': '#faa', 'a': '#afa', 'span': '#fea'}
         tokens = re.split(r'(<[das]\s.*?<\/[das]>)', highlight_text)
-        # print(tokens)
+        print(tokens)
         annotations = []  # ['Sorry i ', ('forgot', 'VERB:TENSE', '#fea'), ' how to write. ', ('Tomorrow', 'SPELL', '#fea'), ' i ', ('remember.', 'VERB', '#fea'), '']
         for token in tokens:
             soup = BeautifulSoup(token, 'html.parser')
             tags = soup.findAll()
+            for tag in tags:
+                print('----', tag.sourcepos)
+
 
             if tags:
                 _tag = tags[0].name
                 _type = tags[0]['type']
                 _text = tags[0]['edit']
                 _desc = tags[0]['desc']
-                _color = color_map[_tag]
+
+                # _color = color_map[_tag]
 
                 if _tag == 'd':
                     _text = strikeout(tags[0].text)
-                    print(_text)
+
 
                 annotations.append((_text, _type, _desc))
             else:
@@ -168,7 +172,7 @@ def show_highlights(input_text, corrected_sentence):
         return highlight_text
 
     except Exception as e:
-        print('Some error occured!' + str(e))
+        print('Some error occured! --> ' + str(e))
         return 'An error occurred'
 
 
@@ -195,6 +199,10 @@ def description(orig, edit, edit_type):
         "NOUN:NUM": '%s may not agree in number with other words in this phrase. Consider changing to %s' % (
             orig, edit),
         "VERB:TENSE": 'The verb tense %s may be incorrect. Consider changing to %s' % (
+            orig, edit),
+        "ADV": 'The adverb  %s may be incorrect.' % (
+            orig),
+        "VERB": 'The verb  %s may be incorrect. Consider changing to %s' % (
             orig, edit),
         "VERB:SVA": 'The verb %s may be incorrect. Consider changing to %s' % (
             orig, edit),

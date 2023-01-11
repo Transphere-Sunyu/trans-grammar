@@ -239,11 +239,6 @@ div[role="progressbar"]::before {
   margin-left: 0.5em;
 }
 
-.nav-icons {
-  /* margin-top: auto;
-  margin-bottom: 0;
-  align-items: flex-end; */
-}
 
 /* .nav-icons :first-child{
   flex-grow: 1;
