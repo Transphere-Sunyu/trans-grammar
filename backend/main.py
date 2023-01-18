@@ -2,6 +2,7 @@ import datetime
 import json
 import os.path
 import re
+import traceback
 
 import errant
 import torch
@@ -14,7 +15,7 @@ from gramformer import Gramformer
 from pydantic import BaseModel
 from transformers import AutoModelForSeq2SeqLM
 from transformers import AutoTokenizer
-
+import subprocess
 annotator = errant.load('en')
 
 PATH = os.path.abspath('models/gf.pth')
@@ -80,7 +81,27 @@ except:
 # def read_root():
 #     return {"Gramformer !"}
 
+import subprocess
 
+def build_code():
+    return subprocess.run('git pull && cd ../frontend && npm i && npm run build', shell=True)
+
+
+@api_app.post("/build")
+async def build():
+    path = os.path.abspath('build.sh')
+
+    # Run the Bash script
+    try:
+        subprocess.run([path])
+        return {"message": "Script executed successfully"}
+    except Exception as e:
+        tb_str = traceback.format_exc()
+        # or write the string to a file
+        with open('traceback.log', 'w') as f:
+            f.write(tb_str)
+        print(e)
+        return {"message": "Error while running the script"}
 
 
 @api_app.post("/sentence")
@@ -174,8 +195,6 @@ def show_highlights(input_text, corrected_sentence):
     except Exception as e:
         print('Some error occured! --> ' + str(e))
         return 'An error occurred'
-
-
 
 
 

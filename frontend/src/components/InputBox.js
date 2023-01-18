@@ -575,13 +575,7 @@ export default function InputBox() {
           </Box>
         </div>
       </Box>
-      {/* <Editor
-        editorState={editorState}
-        wrapperClassName="editor"
-        editorClassName="editor-body"
-        onChange={ onEditorChange}
 
-      /> */}
       <br />
       <br />
     </Box>
