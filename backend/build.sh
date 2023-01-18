@@ -7,7 +7,7 @@ cd /trans-grammar
 git pull
 
 # Navigate to the frontend directory
-cd /frontend
+cd ../frontend
 
 # Install dependencies
 npm install
