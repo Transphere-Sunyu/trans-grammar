@@ -19,10 +19,16 @@ Backend
      
      source venv/bin/activate && pip3 install -r requirements.txt
 
+     python3 -m spacy download en
+
 Frontend
      
-     cd frontend && npm i
-    
+     cd frontend && npm i && npm run build
+# Login to hugging face 
+Enter your access token from your hugging face account
+
+      huggingface-cli login
+      
 # Run the web application
 Backend
 
