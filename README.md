@@ -40,3 +40,8 @@ Frontend
     
 
 Open the website in your browser at http://localhost:3000
+
+# Preview
+[Live](https://www.transphere.com/technology/transgrammar)
+![image](https://github.com/Transphere-Sunyu/trans-grammar/assets/44803250/84f60f16-6bb3-4a62-9656-259a69aaaa7f)
+
